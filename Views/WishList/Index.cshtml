@@ -1,0 +1,42 @@
+﻿@model List<ShoppingMVC.Models.Wishlist>
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<h2>Wishlist</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Item Price</th>
+                <th>Quantity</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ItemName</td>
+                    <td>@item.ItemPrice</td>
+                    <td>@(item.ItemPrice * item.ItemQuantity)</td>
+                    <td>
+                        <!-- Add a form with a Remove button for each item -->
+                        <form asp-controller="WishList" asp-action="RemoveFromWishlist" method="post">
+                            <input type="hidden" name="itemId" value="@item.ItemId" />
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Your wishlist is empty.</p>
+}

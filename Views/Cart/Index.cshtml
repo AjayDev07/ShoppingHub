@@ -1,0 +1,52 @@
+﻿@model List<ShoppingMVC.Models.Cart>
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<h2>Shopping Cart</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Item Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                decimal totalAmount = 0;
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ItemName</td>
+                    <td>@item.ItemPrice</td>
+                    <td>@item.ItemQuantity</td>
+                    <td>@(item.ItemPrice * item.ItemQuantity)</td>
+                    <td>
+                        <!-- Add a form with a Remove button for each item -->
+                        <form asp-controller="Cart" asp-action="RemoveFromCart" method="post">
+                            <input type="hidden" name="itemId" value="@item.ItemId" />
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </td>
+                    @{
+                        totalAmount += item.ItemPrice * item.ItemQuantity;
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p>Total Amount: @totalAmount</p>
+}
+else
+{
+    <p>Your shopping cart is empty.</p>
+}
