@@ -12,7 +12,6 @@ namespace ShoppingMVC.Controllers
         {
             _context = context;
         }
-
         public IActionResult Index()
         {
             var userId = HttpContext.Session.GetInt32("UserId");

@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Home Page";
+    bool isAdmin = ViewData["Admin"] as bool? ?? false;
 }
 
 <div class="text-center">
@@ -13,9 +14,11 @@
 <div>
     <h2>Items</h2>
 
-    <a>
-        <input type="submit" value="Add Item" class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index" />
-    </a>    
+   @if(isAdmin) {
+        <form asp-action="AddItemIndex" >
+        <button type="submit" class="btn btn-primary">Add Item</button>
+    </form>
+   }
 
     <table class="table">
         <thead>
@@ -55,15 +58,12 @@
         var isAuthenticated = @User.Identity.IsAuthenticated.ToString().ToLower();
 
         if (!isAuthenticated) {
-            //alert('Please log in to add items to the cart.');
-            //return;
-
 
             var quantityInput = document.querySelector('input[name="quantity_' + itemId + '"]');
             var quantity = parseInt(quantityInput.value);
             var total = quantity * itemPrice;
 
-            alert('Added to cart: ' + itemName + ' - Quantity: ' + quantity + ' - Total: ' + total);
+            alert('Adding to cart: ' + itemName + ' - Quantity: ' + quantity + ' - Total: ' + total);
 
             var cartItem = {
                 ItemId: itemId,
@@ -80,7 +80,7 @@
                 data: JSON.stringify(cartItem),
                 success: function (data) {
                     if (data.success) {
-                        alert('Added to cart successfully!');
+                        alert('Add to cart successfully!');
                     } else {
                         alert('Please login first, Failed to add to cart.');
                     }
@@ -96,15 +96,12 @@
         var isAuthenticated = @User.Identity.IsAuthenticated.ToString().ToLower();
 
         if (!isAuthenticated) {
-            //alert('Please log in to add items to the cart.');
-            //return;
-
 
             var quantityInput = document.querySelector('input[name="quantity_' + itemId + '"]');
             var quantity = parseInt(quantityInput.value);
             var total = quantity * itemPrice;
 
-            alert('Added to Wishlist: ' + itemName + ' - Quantity: ' + quantity + ' - Total: ' + total);
+            alert('Adding to Wishlist: ' + itemName + ' - Quantity: ' + quantity + ' - Total: ' + total);
 
             var cartItem = {
                 ItemId: itemId,

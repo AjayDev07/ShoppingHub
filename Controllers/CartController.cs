@@ -53,6 +53,49 @@ namespace ShoppingMVC.Controllers
             return Json(new { success = false });
         }
 
+
+        // In CartController
+        [HttpPost]
+        public async Task<IActionResult> MoveToCart(int itemId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var wishlistItem = await _context.Wishlist.FirstOrDefaultAsync(w => w.UserId == userId.ToString() && w.ItemId == itemId);
+
+            if (wishlistItem != null)
+            {
+                // Check if the item already exists in the cart
+                var existingCartItem = _context.Cart.FirstOrDefault(c => c.UserId == userId.ToString() && c.ItemId == itemId);
+
+                if (existingCartItem != null)
+                {
+                    // Item with the same userId and itemId already exists in the cart, update the quantity
+                    existingCartItem.ItemQuantity += wishlistItem.ItemQuantity;
+                }
+                else
+                {
+                    // Item does not exist in the cart, add it
+                    var cartItem = new Cart
+                    {
+                        ItemId = wishlistItem.ItemId,
+                        ItemName = wishlistItem.ItemName,
+                        ItemPrice = wishlistItem.ItemPrice,
+                        ItemQuantity = wishlistItem.ItemQuantity,
+                        UserId = wishlistItem.UserId
+                    };
+
+                    _context.Cart.Add(cartItem);
+                }
+
+                // Remove the item from the wishlist
+                _context.Wishlist.Remove(wishlistItem);
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Index", "WishList");
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> RemoveFromCart(int itemId)
         {

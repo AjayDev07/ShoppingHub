@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingMVC.Data;
 using ShoppingMVC.Models;
+using ShoppingMVC.Models.ViewModels;
 
 namespace ShoppingMVC.Controllers
 {
@@ -52,12 +53,6 @@ namespace ShoppingMVC.Controllers
 
             return View(model);
         }
-
-
-
-
-
-
 
         public async Task<IActionResult> Logout()
         {

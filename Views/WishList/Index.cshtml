@@ -15,6 +15,7 @@
                 <th>Item Price</th>
                 <th>Quantity</th>
                 <th>Remove</th>
+                <th>Move to Cart</th>
             </tr>
         </thead>
         <tbody>
@@ -23,7 +24,7 @@
                 <tr>
                     <td>@item.ItemName</td>
                     <td>@item.ItemPrice</td>
-                    <td>@(item.ItemPrice * item.ItemQuantity)</td>
+                    <td>@(item.ItemQuantity)</td>
                     <td>
                         <!-- Add a form with a Remove button for each item -->
                         <form asp-controller="WishList" asp-action="RemoveFromWishlist" method="post">
@@ -31,12 +32,42 @@
                             <button type="submit" class="btn btn-danger">Remove</button>
                         </form>
                     </td>
+                    <!--MOve to Cart button -->
+                    <td>
+                        <form asp-controller="Cart" asp-action="MoveToCart" method="post">
+                            <input type="hidden" name="itemId" value="@item.ItemId" />
+                            <button type="submit" class="btn btn-success">Move to Cart</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
+
 else
 {
-    <p>Your wishlist is empty.</p>
+    <p>
+        <br />
+        Missing wishlist items?
+        Login to see the items you added previously
+    </p>
 }
+
+<style>
+    /* Add your own styling here */
+    .login-link {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff; /* Blue background color, change it as needed */
+        color: #fff; /* White text color */
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+        .login-link:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+</style>
+
+<a class="login-link" asp-area="" asp-controller="Shopping" asp-action="Index">Login</a>

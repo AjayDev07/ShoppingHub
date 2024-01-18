@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShoppingMVC.Data;
 using ShoppingMVC.Models;
+using ShoppingMVC.Models.ViewModels;
 using System.Diagnostics;
 
 namespace ShoppingMVC.Controllers
@@ -19,9 +20,19 @@ namespace ShoppingMVC.Controllers
 
         public IActionResult Index()
         {
-            // Fetch a list of items from the database  
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var user = _context.Users.Find(userId);
+            
+            if (user != null && user.Role == "Admin")
+            {
+                ViewData["Admin"] = true;
+                // Fetch a list of items from the database  
+            }
+            else
+            {
+                ViewData["Admin"] = false;
+            }
             var items = _context.Items.ToList();
-
             // Pass the list of items to the view
             return View(items);
         }
@@ -35,6 +46,27 @@ namespace ShoppingMVC.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult AddItemIndex(Items newItem)
+        {
+            return View("AddItemIndex");
+        }
+
+
+        [HttpPost]
+        public IActionResult AddItem(Items newItem)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Items.Add(newItem);
+                _context.SaveChanges();
+
+                // Redirect to the Index action to refresh the list of items
+                return RedirectToAction("Index", "Home");
+            }
+            // If the model state is not valid, return to the view with validation errors
+            return View("AddItemIndex");
         }
     }
 }

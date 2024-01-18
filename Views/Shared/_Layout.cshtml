@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">    
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ShoppingMVC.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.css" />
 </head>
 <body>
     <header>
@@ -21,35 +22,33 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <!-- Left-aligned Navbar Items -->
-                    <form class="form-inline my-2 my-lg-0">
-                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="width:250%">
+                    <form class="form-inline  my-2 my-lg-0 ">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="width:300%"</i>
                     </form>
                 </div>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     <!-- Right-aligned Navbar Items -->
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fa fa-home"></i> Home
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Cart</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
+                                <i class="fa fa-shopping-cart"></i> Cart
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Wishlist" asp-action="Index">Wishlist</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Wishlist" asp-action="Index">
+                                <i class="fa fa-list-ul"></i> Wishlist
+                            </a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Profile
+                                <i class="fa fa-user"></i> Profile
                             </a>
                             <div class="dropdown-menu" aria-labelledby="profileDropdown">
-                               @* @if (User.Identity.IsAuthenticated)
-                                {
-                                    <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Logout">Logout</a>
-                                }
-                                else
-                                {
-                                    <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Index">Login</a>
-                                }*@
                                 <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Index">Login</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Logout">Logout</a>
                             </div>
