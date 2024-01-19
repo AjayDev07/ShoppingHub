@@ -52,22 +52,24 @@ else
         Missing wishlist items?
         Login to see the items you added previously
     </p>
-}
 
-<style>
-    /* Add your own styling here */
-    .login-link {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #007bff; /* Blue background color, change it as needed */
-        color: #fff; /* White text color */
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-    }
-        .login-link:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+
+    <style>
+        /* Add your own styling here */
+        .login-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff; /* Blue background color, change it as needed */
+            color: #fff; /* White text color */
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
         }
-</style>
 
-<a class="login-link" asp-area="" asp-controller="Shopping" asp-action="Index">Login</a>
+            .login-link:hover {
+                background-color: #0056b3; /* Darker blue on hover */
+            }
+    </style>
+
+    <a class="login-link" asp-area="" asp-controller="Shopping" asp-action="Index">Login</a>
+}

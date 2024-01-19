@@ -19,6 +19,7 @@ namespace ShoppingMVC.Controllers
         public IActionResult Index()
         {
             var loginModel = new Login();
+            ViewBag.IsLoggedIn = HttpContext.Session.GetInt32("UserId") != null;
             return View(loginModel);
         }
 
@@ -27,7 +28,6 @@ namespace ShoppingMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Check user credentials against the Users table
                 var user = _context.Users.FirstOrDefault(u => u.UserName == model.UserName && u.Password == model.Password);
 
                 if (user != null)
@@ -36,23 +36,27 @@ namespace ShoppingMVC.Controllers
                     var userId = user.Id;
                     var userRole = user.Role;
 
+                    HttpContext.Session.SetInt32("UserId", userId);
+
                     if (userRole != null && userRole == "Admin")
                     {
-                        HttpContext.Session.SetInt32("UserId", userId);
                         return RedirectToAction("Index", "Home");
                     }
                     else
                     {
-                        HttpContext.Session.SetInt32("UserId", userId);
                         return RedirectToAction("Index", "Home");
                     }
                 }
-
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                else
+                {
+                    // Invalid username or password
+                    ViewData["ErrorMessage"] = "Invalid username or password";
+                    return View();
+                }
             }
-
             return View(model);
         }
+
 
         public async Task<IActionResult> Logout()
         {
