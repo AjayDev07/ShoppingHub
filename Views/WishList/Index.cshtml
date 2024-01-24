@@ -4,6 +4,10 @@
     ViewData["Title"] = "Shopping Cart";
 }
 
+@{
+    var isLoggedIn = ViewContext.HttpContext.Session.GetInt32("UserId") != null;
+}
+
 <h2>Wishlist</h2>
 
 @if (Model != null && Model.Any())
@@ -45,15 +49,20 @@
     </table>
 }
 
+
 else
+{
+    <p>Your wishlist is empty</p>
+}
+
+
+@if (!isLoggedIn)
 {
     <p>
         <br />
         Missing wishlist items?
         Login to see the items you added previously
     </p>
-
-
     <style>
         /* Add your own styling here */
         .login-link {

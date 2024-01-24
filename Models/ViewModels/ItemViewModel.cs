@@ -7,6 +7,5 @@
         public string? ItemDiscription { get; set; }
         public int ItemQuantity { get; set; }
         public int ItemPrice { get; set; }
-        
     }
 }

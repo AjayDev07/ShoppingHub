@@ -4,6 +4,10 @@
     ViewData["Title"] = "Shopping Cart";
 }
 
+@{
+    var isLoggedIn = ViewContext.HttpContext.Session.GetInt32("UserId") != null;
+}
+
 <h2>Shopping Cart</h2>
 
 @if (Model != null && Model.Any())
@@ -46,12 +50,18 @@
 
     <p>Total Amount: @totalAmount</p>
 }
+
+
 else
+{
+    <p> Your cart is Empty</p>
+}
+
+
+@if (!isLoggedIn)
 {
     <br />
     <p>Missing cart items? Login to see the items you added previously</p>
-
-
     <style>
         /* Add your own styling here */
         .login-link {

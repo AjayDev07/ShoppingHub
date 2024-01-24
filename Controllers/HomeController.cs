@@ -21,6 +21,7 @@ namespace ShoppingMVC.Controllers
         public IActionResult Index()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
+            //var userName = HttpContext.Session.GetString("UserName");
             var user = _context.Users.Find(userId);
             
             if (user != null && user.Role == "Admin")
@@ -53,7 +54,6 @@ namespace ShoppingMVC.Controllers
             return View("AddItemIndex");
         }
 
-
         [HttpPost]
         public IActionResult AddItem(Items newItem)
         {
@@ -69,5 +69,28 @@ namespace ShoppingMVC.Controllers
             return View("AddItemIndex");
         }
 
+
+        //public IActionResult FilterByCategory(string category)
+        //{
+        //    var userId = HttpContext.Session.GetInt32("UserId");
+        //    var user = _context.Users.Find(userId);
+
+        //    if (user != null && user.Role == "Admin")
+        //    {
+        //        ViewData["Admin"] = true;
+        //    }
+        //    else
+        //    {
+        //        ViewData["Admin"] = false;
+        //    }
+
+        //    //Fetch items based on the category
+        //    var items = string.IsNullOrEmpty(category) ? _context.Items.ToList() : _context.Items.Where(i => i.ItemCategory == category).ToList();
+
+        //    //Pass the list of items and category to the view
+        //    ViewBag.SelectedCategory = category;
+        //    return View("Index", items);
+
+        //}
     }
 }

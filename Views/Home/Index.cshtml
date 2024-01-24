@@ -11,6 +11,36 @@
     <p>Start your shopping according to your choice.</p>
 </div>
 
+
+
+
+@*<div>
+    <label for="categoryDropdown">Select Category:</label>
+    <select id="categoryDropdown" onchange="changeCategory()">
+        <option value="">All Categories</option>
+        <option value="Furniture">Furniture</option>
+        <!-- Add more options for other categories -->
+    </select>
+</div>
+
+<table class="table">
+    <!-- Table headers and body remain unchanged -->
+</table>
+
+<script>
+    function changeCategory() {
+        var selectedCategory = document.getElementById("categoryDropdown").value;
+        window.location.href = '/Home/FilterByCategory?category=' + selectedCategory;
+    }
+</script>*@
+
+
+
+
+
+
+
+
 <div>
     <h2>Items</h2>
 
