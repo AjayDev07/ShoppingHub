@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ShoppingMVC.Data;
 using ShoppingMVC.Models;
 using ShoppingMVC.Models.ViewModels;
-using System.Security.Claims;
 
 namespace ShoppingMVC.Controllers
 {
@@ -70,7 +68,7 @@ namespace ShoppingMVC.Controllers
                 _context.Users.Add(newUser);
                 _context.SaveChanges();
 
-                return RedirectToAction("Index", "Shopping");
+                return RedirectToAction("Index", "Account");
             }
 
             // If the model state is not valid, return to the view with validation errors

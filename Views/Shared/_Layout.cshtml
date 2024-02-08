@@ -2,6 +2,12 @@
     var isLoggedIn = ViewContext.HttpContext.Session.GetInt32("UserId") != null;
 }
 
+@{
+    var totalItemsInCart = ViewBag.TotalItemsInCart;
+    var totalItemsInWishlist = ViewBag.TotalItemsInWislist;
+    // Console.WriteLine($"Total Items in Cart: {totalItemsInCart}");
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,14 +45,32 @@
                                 <i class="fa fa-home"></i> Home
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
                                 <i class="fa fa-shopping-cart"></i> Cart
+                                @if (isLoggedIn)
+                                {
+                                    if (ViewBag.TotalItemsInCart != null && ViewBag.TotalItemsInCart > 0)
+                                    {
+                                        <span class="badge rounded-pill bg-danger">@ViewBag.TotalItemsInCart</span>
+                                    }
+                                }
                             </a>
                         </li>
+
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Wishlist" asp-action="Index">
                                 <i class="fa fa-list-ul"></i> Wishlist
+                                @if (isLoggedIn)
+                                {
+                                    @if (totalItemsInWishlist != null && totalItemsInWishlist > 0)
+                                    {
+                                        <span class="badge rounded-pill bg-danger">@totalItemsInWishlist</span>
+                                    }
+
+                                }
                             </a>
                         </li>
 
@@ -74,11 +98,11 @@
                             <div class="dropdown-menu" aria-labelledby="profileDropdown">
                                 @if (isLoggedIn)
                                 {
-                                    <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Logout">Logout</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
                                 }
                                 else
                                 {
-                                    <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Index">Login</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Index">Login</a>
                                 }
                             </div>
                         </li>
@@ -105,3 +129,9 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script>
+    console.log("Total Items in Cart: @totalItemsInCart");
+</script>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

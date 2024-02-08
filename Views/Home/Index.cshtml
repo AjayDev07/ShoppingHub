@@ -1,10 +1,13 @@
-﻿@model List<ShoppingMVC.Models.Items>
+﻿@model ShoppingMVC.Models.ViewModels.ItemsIndexViewModel
 @using System.Security.Claims
+@using ShoppingMVC.Constants
 
 @{
     ViewData["Title"] = "Home Page";
     bool isAdmin = ViewData["Admin"] as bool? ?? false;
 }
+
+<link rel="stylesheet" href="path/to/styles.css" />
 
 <div class="text-center">
     <h1 class="display-4">Welcome to the Shopping Hub</h1>
@@ -12,43 +15,82 @@
 </div>
 
 
+<style>
+    .category-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-link {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+        .category-link:hover {
+            background-color: #8B4513;
+            color: #fff;
+        }
+</style>
 
 
-@*<div>
-    <label for="categoryDropdown">Select Category:</label>
-    <select id="categoryDropdown" onchange="changeCategory()">
-        <option value="">All Categories</option>
-        <option value="Furniture">Furniture</option>
-        <!-- Add more options for other categories -->
-    </select>
+@* Showing the item description With the Help of Enum*@
+
+@* <div class="category-links">
+    @foreach (var category in Enum.GetValues(typeof(Discription.ItemDiscription)))
+    {
+        var categoryName = Enum.GetName(typeof(Discription.ItemDiscription), category);
+        var categoryRouteValue = category.ToString();
+
+        <a asp-controller="Home" asp-action="Index" asp-route-category="@categoryRouteValue" class="category-link">@categoryName</a>
+    }
+</div> *@
+
+
+
+@* Showing the item description With the Help of Master tabel from the Db*@
+
+<div class="category-links">
+    @foreach (var itemDescription in Model.Categories)
+    {
+        <div>
+            <a asp-controller="Home" asp-action="Index" asp-route-category="@itemDescription" class="category-link">@itemDescription</a>
+        </div>
+    }
 </div>
 
-<table class="table">
-    <!-- Table headers and body remain unchanged -->
-</table>
-
-<script>
-    function changeCategory() {
-        var selectedCategory = document.getElementById("categoryDropdown").value;
-        window.location.href = '/Home/FilterByCategory?category=' + selectedCategory;
-    }
-</script>*@
-
-
-
-
-
-
-
+<br />
+<br />
 
 <div>
-    <h2>Items</h2>
+    <h4>Details:</h4>
 
-   @if(isAdmin) {
-        <form asp-action="AddItemIndex" >
-        <button type="submit" class="btn btn-primary">Add Item</button>
-    </form>
-   }
+    <br />
+
+    @if (isAdmin)
+    {
+        <div class="btn-group" role="group">
+            <form asp-action="AddItemIndex">
+                <button type="submit" class="btn btn-info">Add Item</button>
+            </form>
+
+            <form asp-action="AddItemDescription">
+                <button type="submit" class="btn btn-info" style="margin-left: 10px;"> Add Description</button>
+            </form>
+        </div>
+    }
+
+    <br />
 
     <table class="table">
         <thead>
@@ -61,18 +103,44 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Items)
             {
                 <tr>
                     <td>@item.ItemName</td>
+
                     <td>@item.ItemDiscription</td>
                     <td>
                         <input type="number" min="1" max="@item.ItemQuantity" value="1" name="quantity_@item.ItemId" />
                     </td>
                     <td>@item.ItemPrice</td>
-                    <td>
-                        <button class="btn btn-info" onclick="addToWishlist('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Wishlist</button>
+
+                    <td class="button-container">
+                        <style>
+                            .button-container {
+                                display: flex;
+                                justify-content: space-around;
+                                align-items: center;
+                            }
+                        </style>
+
+                        <button class="btn btn-primary" onclick="addToWishlist('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Wishlist</button>
                         <button class="btn btn-primary" onclick="addToCart('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Cart</button>
+
+                        @if (isAdmin)
+                        {
+                            <form asp-action="RemoveItem" method="post">
+                                <input type="hidden" name="itemId" value="@item.ItemId">
+                                <button type="submit" class="btn btn-danger">Remove Item</button>
+                            </form>
+                        }
+
+                        @if (isAdmin)
+                        {
+                                <form>
+                                    <button type="button" class="btn btn-success" onclick="prepareEditModal('@item.ItemId', '@item.ItemName', '@item.ItemDiscription', '@item.ItemQuantity', '@item.ItemPrice')">Edit</button>
+                                </form>
+                        }
+
                     </td>
                 </tr>
             }
@@ -81,7 +149,92 @@
 </div>
 
 
+<!-- Modal for editing items -->
+<div class="modal fade" id="editItemModal" tabindex="-1" role="dialog" aria-labelledby="editItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editItemForm" method="post">
+                    <input type="hidden" name="itemId" id="editItemId">
+                    <div class="form-group">
+                        <label for="editItemName">Item Name:</label>
+                        <input type="text" class="form-control" id="editItemName" name="itemName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editItemDiscription">Description:</label>
+                        <input type="text" class="form-control" id="editItemDiscription" name="itemDiscription" readonly/>
+                    </div>
+                    <div class="form-group">
+                        <label for="editItemQuantity">Quantity:</label>
+                        <input type="number" class="form-control" id="editItemQuantity" name="itemQuantity" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editItemPrice">Price:</label>
+                        <input type="number" class="form-control" id="editItemPrice" name="itemPrice" />
+                    </div>
+                    <br />
+                    <button type="submit" class="btn btn-primary" asp-action="EditItem" asp-controller="Home" method="post">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="jquery-3.7.1.min.js"></script>
+
+<script>
+    function prepareEditModal(itemId, itemName, itemDiscription, itemQuantity, itemPrice) {
+        $("#editItemId").val(itemId);
+        $("#editItemName").val(itemName);
+        $("#editItemDiscription").val(itemDiscription);  
+        $("#editItemQuantity").val(itemQuantity);
+        $("#editItemPrice").val(itemPrice);
+        $("#editItemModal").modal("show");
+    }
+
+    $("#editItemForm").submit(function (e) {
+        e.preventDefault();
+
+        var itemId = $("#editItemId").val();
+        var itemName = $("#editItemName").val();
+        var itemDiscription = $("#editItemDiscription").val();  
+        var itemQuantity = $("#editItemQuantity").val();
+        var itemPrice = $("#editItemPrice").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/EditItem",
+            data: {
+                ItemId: itemId,
+                ItemName: itemName,
+                ItemDiscription: itemDiscription,  
+                ItemQuantity: itemQuantity,
+                ItemPrice: itemPrice
+            },
+            success: function (data) {
+                if (data.success) {
+                    alert("Item edited successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to edit item.");
+                }
+            },
+            error: function () {
+                alert("Error in the AJAX request.");
+            }
+        });
+
+        $("#editItemModal").modal("hide");
+    });
+</script>
+
 
 <script>
     function addToCart(itemName, itemPrice, itemId) {
@@ -119,7 +272,6 @@
         }
     }
 </script>
-
 
 <script>
     function addToWishlist(itemName, itemPrice, itemId) {

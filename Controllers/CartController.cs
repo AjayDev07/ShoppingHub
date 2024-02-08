@@ -13,16 +13,16 @@ namespace ShoppingMVC.Controllers
             _context = context;
         }
 
+
         public IActionResult Index()
         {
-            // Retrieve the user's cart items
-
             var userId = HttpContext.Session.GetInt32("UserId");
             var cartItems = _context.Cart.Where(c => c.UserId == userId.ToString()).ToList();
 
             return View(cartItems);
         }
 
+        #region AddToCart
         [HttpPost]
         public async Task<IActionResult> AddToCart([FromBody] Cart cartItem)
         {
@@ -52,8 +52,10 @@ namespace ShoppingMVC.Controllers
             }
             return Json(new { success = false });
         }
+        #endregion
 
 
+        #region MoveToCart
         [HttpPost]
         public async Task<IActionResult> MoveToCart(int itemId)
         {
@@ -95,8 +97,10 @@ namespace ShoppingMVC.Controllers
 
             return RedirectToAction("Index", "WishList");
         }
+        #endregion
 
 
+        #region RemoveFromCart
         [HttpPost]
         public async Task<IActionResult> RemoveFromCart(int itemId)
         {
@@ -109,6 +113,7 @@ namespace ShoppingMVC.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index", "Cart");
-        }
+        } 
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ShoppingMVC.Models.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShoppingMVC.Models
 {
