@@ -13,5 +13,6 @@ namespace ShoppingMVC.Data
         public DbSet<Items> Items { get; set; }
         public DbSet<Cart>Cart{ get; set; }
         public DbSet<Wishlist> Wishlist { get; set; }
+        public DbSet<Category> Category { get; set; }
     }
 }

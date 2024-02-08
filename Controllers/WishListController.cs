@@ -20,6 +20,7 @@ namespace ShoppingMVC.Controllers
             return View(wishListItems);
         }
 
+        #region AddToWishlist
         [HttpPost]
         public async Task<IActionResult> AddToWishlist([FromBody] Wishlist wishlistItem)
         {
@@ -49,12 +50,14 @@ namespace ShoppingMVC.Controllers
             }
             return Json(new { success = false });
         }
+        #endregion
 
+        #region RemoveFromWishList
         [HttpPost]
         public async Task<IActionResult> RemoveFromWishlist(int itemId)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
-            var wishlistItem =await _context.Wishlist.FirstOrDefaultAsync(w => w.UserId == userId.ToString() && w.ItemId == itemId);
+            var wishlistItem = await _context.Wishlist.FirstOrDefaultAsync(w => w.UserId == userId.ToString() && w.ItemId == itemId);
 
             if (wishlistItem != null)
             {
@@ -62,6 +65,7 @@ namespace ShoppingMVC.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index", "WishList");
-        }
+        } 
+        #endregion
     }
 }

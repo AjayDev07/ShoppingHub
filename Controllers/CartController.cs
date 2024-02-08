@@ -13,16 +13,16 @@ namespace ShoppingMVC.Controllers
             _context = context;
         }
 
+
         public IActionResult Index()
         {
-            // Retrieve the user's cart items
-
             var userId = HttpContext.Session.GetInt32("UserId");
             var cartItems = _context.Cart.Where(c => c.UserId == userId.ToString()).ToList();
 
             return View(cartItems);
         }
 
+        #region AddToCart
         [HttpPost]
         public async Task<IActionResult> AddToCart([FromBody] Cart cartItem)
         {
@@ -42,7 +42,7 @@ namespace ShoppingMVC.Controllers
                     }
                     else
                     {
-                        // Item does not exist, add it to the cart
+                        // Item does not exist then add it to the cart
                         cartItem.UserId = userId.ToString();
                         _context.Cart.Add(cartItem);
                         await _context.SaveChangesAsync();
@@ -52,9 +52,10 @@ namespace ShoppingMVC.Controllers
             }
             return Json(new { success = false });
         }
+        #endregion
 
 
-        // In CartController
+        #region MoveToCart
         [HttpPost]
         public async Task<IActionResult> MoveToCart(int itemId)
         {
@@ -64,12 +65,13 @@ namespace ShoppingMVC.Controllers
             if (wishlistItem != null)
             {
                 // Check if the item already exists in the cart
-                var existingCartItem = _context.Cart.FirstOrDefault(c => c.UserId == userId.ToString() && c.ItemId == itemId);
+                var existingCartItem = await _context.Cart.FirstOrDefaultAsync(c => c.UserId == userId.ToString() && c.ItemId == itemId);
 
                 if (existingCartItem != null)
                 {
                     // Item with the same userId and itemId already exists in the cart, update the quantity
                     existingCartItem.ItemQuantity += wishlistItem.ItemQuantity;
+
                 }
                 else
                 {
@@ -90,24 +92,28 @@ namespace ShoppingMVC.Controllers
                 _context.Wishlist.Remove(wishlistItem);
 
                 await _context.SaveChangesAsync();
+
             }
 
             return RedirectToAction("Index", "WishList");
         }
+        #endregion
 
 
+        #region RemoveFromCart
         [HttpPost]
         public async Task<IActionResult> RemoveFromCart(int itemId)
         {
-            var userId=HttpContext.Session.GetInt32("UserId");
+            var userId = HttpContext.Session.GetInt32("UserId");
             var cartItem = await _context.Cart.FirstOrDefaultAsync(c => c.UserId == userId.ToString() && c.ItemId == itemId);
 
-            if(cartItem!= null)
+            if (cartItem != null)
             {
                 _context.Cart.Remove(cartItem);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction("Index","Cart");
-        }
+            return RedirectToAction("Index", "Cart");
+        } 
+        #endregion
     }
 }

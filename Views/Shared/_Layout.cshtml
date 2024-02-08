@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isLoggedIn = ViewContext.HttpContext.Session.GetInt32("UserId") != null;
+}
+
+@{
+    var totalItemsInCart = ViewBag.TotalItemsInCart;
+    var totalItemsInWishlist = ViewBag.TotalItemsInWislist;
+    // Console.WriteLine($"Total Items in Cart: {totalItemsInCart}");
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -22,10 +32,11 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <!-- Left-aligned Navbar Items -->
-                    <form class="form-inline  my-2 my-lg-0 ">
-                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="width:300%"</i>
+                    <form class="form-inline my-2 my-lg-0">
+                        <input id="searchInput" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="width:300%">
                     </form>
                 </div>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     <!-- Right-aligned Navbar Items -->
                     <ul class="navbar-nav ml-auto">
@@ -34,25 +45,68 @@
                                 <i class="fa fa-home"></i> Home
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
                                 <i class="fa fa-shopping-cart"></i> Cart
+                                @if (isLoggedIn)
+                                {
+                                    if (ViewBag.TotalItemsInCart != null && ViewBag.TotalItemsInCart > 0)
+                                    {
+                                        <span class="badge rounded-pill bg-danger">@ViewBag.TotalItemsInCart</span>
+                                    }
+                                }
                             </a>
                         </li>
+
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Wishlist" asp-action="Index">
                                 <i class="fa fa-list-ul"></i> Wishlist
+                                @if (isLoggedIn)
+                                {
+                                    @if (totalItemsInWishlist != null && totalItemsInWishlist > 0)
+                                    {
+                                        <span class="badge rounded-pill bg-danger">@totalItemsInWishlist</span>
+                                    }
+
+                                }
                             </a>
                         </li>
+
+                        @if (!isLoggedIn)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="SignUp">
+                                    <i class="fa fa-sign-in"></i> SignUp
+                                </a>
+                            </li>
+                        }
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-user"></i> Profile
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                                @if (isLoggedIn)
+                                {
+                                    <i class="fa fa-user"></i> <span>Welcome, @TempData["UserName"]</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user"> </i>
+                                    <span>Profile</span>
+                                }
                             </a>
                             <div class="dropdown-menu" aria-labelledby="profileDropdown">
-                                <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Index">Login</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Shopping" asp-action="Logout">Logout</a>
+                                @if (isLoggedIn)
+                                {
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                                }
+                                else
+                                {
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Index">Login</a>
+                                }
                             </div>
                         </li>
+
                     </ul>
                 </div>
             </div>
@@ -63,15 +117,21 @@
             @RenderBody()
         </main>
     </div>
-
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2024 - ShoppingMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script>
+    console.log("Total Items in Cart: @totalItemsInCart");
+</script>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

@@ -1,4 +1,4 @@
-﻿@model ShoppingMVC.Models.Items
+﻿@model ShoppingMVC.Models.ViewModels.ItemViewModel
 
 <h2>Add Item</h2>
 
@@ -6,28 +6,45 @@
     <div class="form-group">
         <label asp-for="ItemName"></label>
         <input asp-for="ItemName" class="form-control" />
-       
     </div>
 
-    <div class="form-group">
-        <label asp-for="ItemDiscription"></label>
-        <input asp-for="ItemDiscription" class="form-control" />
-        
-    </div>
+    @* <div class="form-group">
+        <label asp-for="ItemDiscription">Item Description</label>
+        <select asp-for="ItemDiscription" class="form-control">
+            <option value="">Select</option>
+            @foreach (var enumValue in Enum.GetValues(typeof(ShoppingMVC.Constants.Discription.ItemDiscription)))
+            {
+                <option value="@((int)enumValue)">@enumValue.ToString()</option>
+            }
+        </select> *@
+
+        <div class="form-group">
+            <label asp-for="ItemDiscription">Item Description</label>
+            <select asp-for="ItemDiscription" class="form-control">
+                <option value="">Select</option>
+                @if (ViewBag.ItemDescriptions != null)
+                {
+                    foreach (var description in ViewBag.ItemDescriptions)
+                    {
+                        <option value="@description">@description</option>
+                    }
+                }
+            </select>
+        </div>
+
 
     <div class="form-group">
         <label asp-for="ItemQuantity"></label>
         <input asp-for="ItemQuantity" class="form-control" />
-        
+
     </div>
 
     <div class="form-group">
         <label asp-for="ItemPrice"></label>
         <input asp-for="ItemPrice" class="form-control" />
-        
     </div>
-    <br />
 
+    <br />
     <button type="submit" class="btn btn-primary">Add Item</button>
 </form>
 
@@ -60,11 +77,8 @@
                     $('#ItemPrice').next('.text-danger').text('Item Price is required.');
                 }
 
-                // Prevent the form from submitting
                 event.preventDefault();
             }
-            // Allow the form to submit if all fields are filled
-            // No need to return true, as we've already prevented the default behavior for empty fields
         });
     });
 </script>
