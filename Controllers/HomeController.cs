@@ -47,7 +47,8 @@ namespace ShoppingMVC.Controllers
 
             // Fetch items based on the selected category or fetch all items if no category is specified
             var items = string.IsNullOrEmpty(category) ? _context.Items.ToList() : _context.Items.Where(item => item.ItemDiscription.Contains(category)).ToList();
-            var categories = _context.Category.Select(i=>i.CategoryName).ToList();
+            //var categories = _context.Category.Select(i => i.CategoryName).ToList();
+            var categories = _context.Category.Select(i => i.CategoryName).ToList();
             foreach (var item in items)
             {
                 int itemDescriptionValue;

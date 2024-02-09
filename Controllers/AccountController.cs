@@ -75,7 +75,7 @@ namespace ShoppingMVC.Controllers
             return View(model);
         }
         #endregion
-
+         
         #region Login
         public IActionResult Index()
         {

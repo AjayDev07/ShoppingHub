@@ -7,6 +7,24 @@
     bool isAdmin = ViewData["Admin"] as bool? ?? false;
 }
 
+@{
+    // Pagination logic
+    var currentPage = Context.Request.Query["page"].FirstOrDefault();
+    if (string.IsNullOrEmpty(currentPage))
+    {
+        currentPage = "1"; // Default to first page if no page query parameter is provided
+    }
+    var itemsPerPage = 5;
+    var startIndex = (Convert.ToInt32(currentPage) - 1) * itemsPerPage;
+    var pagedItems = Model.Items.Skip(startIndex).Take(itemsPerPage);
+    var serialNumber = startIndex + 1;
+
+    // Pagination navigation
+    var totalItems = Model.Items != null ? Model.Items.Count() : 0; // Check if Model.Items is not null and then get the count
+    var totalPages = (int)Math.Ceiling((double)totalItems / itemsPerPage);
+}
+
+
 <link rel="stylesheet" href="path/to/styles.css" />
 
 <div class="text-center">
@@ -21,7 +39,7 @@
         flex-wrap: wrap;
         justify-content: center;
         align-items: center;
-        background-color: #fff;
+        background-color: #f5f5f5;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -35,13 +53,19 @@
         margin: 10px;
         border-radius: 5px;
         transition: background-color 0.3s ease, color 0.3s ease;
+        background-color: #fff; 
+        border: 2px solid #8B4513; 
     }
 
         .category-link:hover {
             background-color: #8B4513;
-            color: #fff;
+            color: #fff; 
         }
 </style>
+
+
+
+@*-----------------------------------------------------------------------*@
 
 
 @* Showing the item description With the Help of Enum*@
@@ -55,6 +79,8 @@
         <a asp-controller="Home" asp-action="Index" asp-route-category="@categoryRouteValue" class="category-link">@categoryName</a>
     }
 </div> *@
+
+@*-----------------------------------------------------------------------*@
 
 
 
@@ -74,7 +100,6 @@
 
 <div>
     <h4>Details:</h4>
-
     <br />
 
     @if (isAdmin)
@@ -83,7 +108,6 @@
             <form asp-action="AddItemIndex">
                 <button type="submit" class="btn btn-info">Add Item</button>
             </form>
-
             <form asp-action="AddItemDescription">
                 <button type="submit" class="btn btn-info" style="margin-left: 10px;"> Add Description</button>
             </form>
@@ -92,9 +116,22 @@
 
     <br />
 
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            @for (var i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == Convert.ToInt32(currentPage) ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+
     <table class="table">
         <thead>
             <tr>
+                <th>Sr. No.</th>
                 <th>Item Name</th>
                 <th>Description</th>
                 <th>Quantity</th>
@@ -103,17 +140,16 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Items)
+            @foreach (var item in pagedItems)
             {
                 <tr>
+                    <td>@serialNumber</td>
                     <td>@item.ItemName</td>
-
                     <td>@item.ItemDiscription</td>
                     <td>
                         <input type="number" min="1" max="@item.ItemQuantity" value="1" name="quantity_@item.ItemId" />
                     </td>
                     <td>@item.ItemPrice</td>
-
                     <td class="button-container">
                         <style>
                             .button-container {
@@ -122,31 +158,30 @@
                                 align-items: center;
                             }
                         </style>
-
-                        <button class="btn btn-primary" onclick="addToWishlist('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Wishlist</button>
-                        <button class="btn btn-primary" onclick="addToCart('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Cart</button>
-
+                        <button class="btn btn-primary btn-sm" onclick="addToWishlist('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Wishlist</button>
+                        <button class="btn btn-primary btn-sm" onclick="addToCart('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Cart</button>
                         @if (isAdmin)
                         {
                             <form asp-action="RemoveItem" method="post">
                                 <input type="hidden" name="itemId" value="@item.ItemId">
-                                <button type="submit" class="btn btn-danger">Remove Item</button>
+                                <button type="submit" class="btn btn-danger btn-sm">Remove Item</button>
                             </form>
                         }
-
                         @if (isAdmin)
                         {
-                                <form>
-                                    <button type="button" class="btn btn-success" onclick="prepareEditModal('@item.ItemId', '@item.ItemName', '@item.ItemDiscription', '@item.ItemQuantity', '@item.ItemPrice')">Edit</button>
-                                </form>
+                            <form>
+                                <button type="button" class="btn btn-success btn-sm" onclick="prepareEditModal('@item.ItemId', '@item.ItemName', '@item.ItemDiscription', '@item.ItemQuantity', '@item.ItemPrice')">Edit</button>
+                            </form>
                         }
-
                     </td>
                 </tr>
+                serialNumber++;
             }
         </tbody>
     </table>
 </div>
+
+
 
 
 <!-- Modal for editing items -->
