@@ -19,8 +19,7 @@ namespace ShoppingMVC.Controllers
             _context = context;
         }
 
-
-        public IActionResult Index(string category)
+        public IActionResult Index(string category, string searchItem = null)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             var user = _context.Users.Find(userId);
@@ -34,21 +33,18 @@ namespace ShoppingMVC.Controllers
                 ViewData["Admin"] = false;
             }
 
-            //Fetching the data for Cart Notification
-            var cartItems = _context.Cart.Where(c => c.UserId == userId.ToString()).ToList();
-            var totalItems = cartItems.Count();
-            ViewBag.TotalItemsInCart = totalItems;
-
-
-            //Fetching the data for Wishlist notification
-            var wishListItems = _context.Wishlist.Where(w => w.UserId == userId.ToString()).ToList();
-            var wishlisttotalItems = wishListItems.Count();
-            ViewBag.TotalItemsInWislist = wishlisttotalItems;
-
             // Fetch items based on the selected category or fetch all items if no category is specified
-            var items = string.IsNullOrEmpty(category) ? _context.Items.ToList() : _context.Items.Where(item => item.ItemDiscription.Contains(category)).ToList();
-            //var categories = _context.Category.Select(i => i.CategoryName).ToList();
+            IQueryable<Items> itemsQuery = string.IsNullOrEmpty(category) ? _context.Items : _context.Items.Where(item => item.ItemDiscription.Contains(category));
+
+            // Filter items based on the search query (item name)
+            if (!string.IsNullOrEmpty(searchItem))
+            {
+                itemsQuery = itemsQuery.Where(item => item.ItemName.Contains(searchItem));
+            }
+
+            var items = itemsQuery.ToList();
             var categories = _context.Category.Select(i => i.CategoryName).ToList();
+
             foreach (var item in items)
             {
                 int itemDescriptionValue;
@@ -57,6 +53,7 @@ namespace ShoppingMVC.Controllers
                     item.ItemDiscription = ((ItemDiscription)itemDescriptionValue).ToString();
                 }
             }
+
             var model = new ItemsIndexViewModel();
             model.Items = items;
             model.Categories = categories;
@@ -64,6 +61,54 @@ namespace ShoppingMVC.Controllers
             // Pass the list of items to the view
             return View(model);
         }
+
+
+
+
+        //public IActionResult Index(string category, string searchItem = null)
+        //{
+        //    var userId = HttpContext.Session.GetInt32("UserId");
+        //    var user = _context.Users.Find(userId);
+
+        //    if (user != null && user.Role == "Admin")
+        //    {
+        //        ViewData["Admin"] = true;
+        //    }
+        //    else
+        //    {
+        //        ViewData["Admin"] = false;
+        //    }
+
+        //    //Fetching the data for Cart Notification
+        //    var cartItems = _context.Cart.Where(c => c.UserId == userId.ToString()).ToList();
+        //    var totalItems = cartItems.Count();
+        //    ViewBag.TotalItemsInCart = totalItems;
+
+
+        //    //Fetching the data for Wishlist notification
+        //    var wishListItems = _context.Wishlist.Where(w => w.UserId == userId.ToString()).ToList();
+        //    var wishlisttotalItems = wishListItems.Count();
+        //    ViewBag.TotalItemsInWislist = wishlisttotalItems;
+
+        //    // Fetch items based on the selected category or fetch all items if no category is specified
+        //    var items = string.IsNullOrEmpty(category) ? _context.Items.ToList() : _context.Items.Where(item => item.ItemDiscription.Contains(category)).ToList();
+        //    //var categories = _context.Category.Select(i => i.CategoryName).ToList();
+        //    var categories = _context.Category.Select(i => i.CategoryName).ToList();
+        //    foreach (var item in items)
+        //    {
+        //        int itemDescriptionValue;
+        //        if (int.TryParse(item.ItemDiscription, out itemDescriptionValue))
+        //        {
+        //            item.ItemDiscription = ((ItemDiscription)itemDescriptionValue).ToString();
+        //        }
+        //    }
+        //    var model = new ItemsIndexViewModel();
+        //    model.Items = items;
+        //    model.Categories = categories;
+
+        //    // Pass the list of items to the view
+        //    return View(model);
+        //}
 
 
         public IActionResult Privacy()

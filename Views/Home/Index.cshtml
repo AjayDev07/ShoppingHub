@@ -22,6 +22,7 @@
     // Pagination navigation
     var totalItems = Model.Items != null ? Model.Items.Count() : 0; // Check if Model.Items is not null and then get the count
     var totalPages = (int)Math.Ceiling((double)totalItems / itemsPerPage);
+
 }
 
 
@@ -53,23 +54,19 @@
         margin: 10px;
         border-radius: 5px;
         transition: background-color 0.3s ease, color 0.3s ease;
-        background-color: #fff; 
-        border: 2px solid #8B4513; 
+        background-color: #fff;
+        border: 2px solid #8B4513;
     }
 
         .category-link:hover {
             background-color: #8B4513;
-            color: #fff; 
+            color: #fff;
         }
 </style>
 
 
 
-@*-----------------------------------------------------------------------*@
-
-
-@* Showing the item description With the Help of Enum*@
-
+@*----------------------------------Showing the item description With the Help of Enum-------------------------------------*@
 @* <div class="category-links">
     @foreach (var category in Enum.GetValues(typeof(Discription.ItemDiscription)))
     {
@@ -79,7 +76,6 @@
         <a asp-controller="Home" asp-action="Index" asp-route-category="@categoryRouteValue" class="category-link">@categoryName</a>
     }
 </div> *@
-
 @*-----------------------------------------------------------------------*@
 
 
@@ -99,7 +95,6 @@
 <br />
 
 <div>
-    <h4>Details:</h4>
     <br />
 
     @if (isAdmin)
@@ -114,74 +109,135 @@
         </div>
     }
 
-    <br />
+    <br /><br />
+    <h4>Details:</h4>
 
-    <!-- Pagination -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            @for (var i = 1; i <= totalPages; i++)
+    <style>
+        /* Custom dark theme styles for table headings */
+        .table thead {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+
+        .table th {
+            padding: 10px; /* Adjust as needed */
+            border-right: 1px solid #ffffff; /* Add border between columns */
+        }
+
+            .table th:last-child {
+                border-right: none; /* Remove border for the last column */
+            }
+        /* Add border between table rows */
+        .table tbody tr {
+            border-top: 1px solid #dee2e6; /* Add border between rows */
+        }
+
+        .table td {
+            padding: 10px; /* Adjust as needed */
+        }
+    </style>
+
+    @if (Model.Items.Count() == 0)
+    {
+        <p>There are no items matching your search.</p>
+    }
+    else
+    {
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr. No.</th>
+                    <th>Item Name</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in pagedItems)
+                {
+                    <tr>
+                        <td>@serialNumber</td>
+                        <td>@item.ItemName</td>
+                        <td>@item.ItemDiscription</td>
+                        <td>
+                            <input type="number" min="1" max="@item.ItemQuantity" value="1" name="quantity_@item.ItemId" />
+                        </td>
+                        <td>@item.ItemPrice</td>
+                        <td class="button-container">
+                            <style>
+                                .button-container {
+                                    display: flex;
+                                    justify-content: space-around;
+                                    align-items: center;
+                                }
+                            </style>
+                            <button class="btn btn-primary btn-sm" onclick="addToWishlist('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Wishlist</button>
+                            <button class="btn btn-primary btn-sm" onclick="addToCart('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Cart</button>
+                            @if (isAdmin)
+                            {
+                                <form asp-action="RemoveItem" method="post">
+                                    <input type="hidden" name="itemId" value="@item.ItemId">
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove Item</button>
+                                </form>
+                            }
+                            @if (isAdmin)
+                            {
+                                <form>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="prepareEditModal('@item.ItemId', '@item.ItemName', '@item.ItemDiscription', '@item.ItemQuantity', '@item.ItemPrice')">Edit</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                    serialNumber++;
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!--Navigation for Pagination-->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        @if (totalPages <= 3)
+        {
+            // If total pages are 3 or less, show all pages
+            for (var i = 1; i <= totalPages; i++)
             {
                 <li class="page-item @(i == Convert.ToInt32(currentPage) ? "active" : "")">
                     <a class="page-link" href="?page=@i">@i</a>
                 </li>
             }
-        </ul>
-    </nav>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr. No.</th>
-                <th>Item Name</th>
-                <th>Description</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in pagedItems)
+        }
+        else
+        {
+            // If total pages are more than 3, show the first 3 pages
+            for (var i = 1; i <= 3; i++)
             {
-                <tr>
-                    <td>@serialNumber</td>
-                    <td>@item.ItemName</td>
-                    <td>@item.ItemDiscription</td>
-                    <td>
-                        <input type="number" min="1" max="@item.ItemQuantity" value="1" name="quantity_@item.ItemId" />
-                    </td>
-                    <td>@item.ItemPrice</td>
-                    <td class="button-container">
-                        <style>
-                            .button-container {
-                                display: flex;
-                                justify-content: space-around;
-                                align-items: center;
-                            }
-                        </style>
-                        <button class="btn btn-primary btn-sm" onclick="addToWishlist('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Wishlist</button>
-                        <button class="btn btn-primary btn-sm" onclick="addToCart('@item.ItemName', @item.ItemPrice, '@item.ItemId')">Add to Cart</button>
-                        @if (isAdmin)
-                        {
-                            <form asp-action="RemoveItem" method="post">
-                                <input type="hidden" name="itemId" value="@item.ItemId">
-                                <button type="submit" class="btn btn-danger btn-sm">Remove Item</button>
-                            </form>
-                        }
-                        @if (isAdmin)
-                        {
-                            <form>
-                                <button type="button" class="btn btn-success btn-sm" onclick="prepareEditModal('@item.ItemId', '@item.ItemName', '@item.ItemDiscription', '@item.ItemQuantity', '@item.ItemPrice')">Edit</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-                serialNumber++;
+                <li class="page-item @(i == Convert.ToInt32(currentPage) ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
             }
-        </tbody>
-    </table>
-</div>
-
-
+            // Show ellipsis dots
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+            // Show link to the next page if it's not the last page
+            @if (Convert.ToInt32(currentPage) < totalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(Convert.ToInt32(currentPage) + 1)">Next</a>
+                </li>
+            }
+            // Show link to the last page
+            <li class="page-item">
+                <a class="page-link" href="?page=@totalPages">Last</a>
+            </li>
+        }
+    </ul>
+</nav>
 
 
 <!-- Modal for editing items -->
@@ -203,7 +259,7 @@
                     </div>
                     <div class="form-group">
                         <label for="editItemDiscription">Description:</label>
-                        <input type="text" class="form-control" id="editItemDiscription" name="itemDiscription" readonly/>
+                        <input type="text" class="form-control" id="editItemDiscription" name="itemDiscription" readonly />
                     </div>
                     <div class="form-group">
                         <label for="editItemQuantity">Quantity:</label>
@@ -228,7 +284,7 @@
     function prepareEditModal(itemId, itemName, itemDiscription, itemQuantity, itemPrice) {
         $("#editItemId").val(itemId);
         $("#editItemName").val(itemName);
-        $("#editItemDiscription").val(itemDiscription);  
+        $("#editItemDiscription").val(itemDiscription);
         $("#editItemQuantity").val(itemQuantity);
         $("#editItemPrice").val(itemPrice);
         $("#editItemModal").modal("show");
@@ -239,7 +295,7 @@
 
         var itemId = $("#editItemId").val();
         var itemName = $("#editItemName").val();
-        var itemDiscription = $("#editItemDiscription").val();  
+        var itemDiscription = $("#editItemDiscription").val();
         var itemQuantity = $("#editItemQuantity").val();
         var itemPrice = $("#editItemPrice").val();
 
@@ -249,7 +305,7 @@
             data: {
                 ItemId: itemId,
                 ItemName: itemName,
-                ItemDiscription: itemDiscription,  
+                ItemDiscription: itemDiscription,
                 ItemQuantity: itemQuantity,
                 ItemPrice: itemPrice
             },
@@ -297,11 +353,12 @@
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(cartItem),
                 success: function (data) {
-                    if (data.success) {
-                        alert('Added to cart successfully!');
-                    } else {
-                        alert('Please login first, Failed to add to cart.');
-                    }
+                    alert(data.success);
+                    // if (data.success) {
+                    //     alert('Added to cart successfully!');
+                    // } else {
+                    //     alert('Please login first, Failed to add to cart.');
+                    // }
                 }
             });
         }

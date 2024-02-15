@@ -30,15 +30,31 @@ namespace ShoppingMVC.Controllers
             {
                 // Retrieve the user ID from session or claim
                 var userId = HttpContext.Session.GetInt32("UserId");
+                var item = _context.Items.FirstOrDefault(c => c.ItemId == cartItem.ItemId);
 
                 var existingCartItem = _context.Cart.FirstOrDefault(c => c.UserId == userId.ToString() && c.ItemId == cartItem.ItemId);
+                var itemQuantity = 0;
+                //if (existingCartItem != null)
+                //    {
+
+                //}
                 if (userId != null)
                 {
                     if (existingCartItem != null)
                     {
-                        // Item with the same UserId and ItemId already exists, update the quantity
-                        existingCartItem.ItemQuantity += cartItem.ItemQuantity;
-                        await _context.SaveChangesAsync();
+                        itemQuantity = item.ItemQuantity - existingCartItem.ItemQuantity;
+                        if (itemQuantity >= cartItem.ItemQuantity)
+                        {
+                            
+                            // Item with the same UserId and ItemId already exists, update the quantity
+                            existingCartItem.ItemQuantity += cartItem.ItemQuantity;
+                            await _context.SaveChangesAsync();
+                        }
+
+                        else
+                        {
+                            return Json(new { success = "Item Quantity is reached out of limit" });
+                        }
                     }
                     else
                     {
@@ -47,10 +63,11 @@ namespace ShoppingMVC.Controllers
                         _context.Cart.Add(cartItem);
                         await _context.SaveChangesAsync();
                     }
-                    return Json(new { success = true });
+                    return Json(new { success = "Added to cart successfully!" });
                 }
+
             }
-            return Json(new { success = false });
+            return Json(new { success = "Please login first, Failed to add to cart." });
         }
         #endregion
 
@@ -113,7 +130,7 @@ namespace ShoppingMVC.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index", "Cart");
-        } 
+        }
         #endregion
     }
 }
