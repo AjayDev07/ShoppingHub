@@ -5,7 +5,6 @@
 @{
     var totalItemsInCart = ViewBag.TotalItemsInCart;
     var totalItemsInWishlist = ViewBag.TotalItemsInWislist;
-    // Console.WriteLine($"Total Items in Cart: {totalItemsInCart}");
 }
 
 <!DOCTYPE html>
@@ -30,12 +29,12 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <!-- Left-aligned Navbar Items -->
-                    <form class="form-inline my-2 my-lg-0">
-                        <input id="searchInput" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="width:300%">
-                    </form>
-                </div>
+
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <form class="form-inline my-2 my-lg-0" method="get">
+                        <input id="searchInput" class="form-control mr-sm-2" name="searchItem" type="search" placeholder="Search" aria-label="Search" style="width:300%">
+                        </form>
+                    </div>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     <!-- Right-aligned Navbar Items -->
@@ -84,7 +83,7 @@
                         }
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 @if (isLoggedIn)
                                 {
                                     <i class="fa fa-user"></i> <span>Welcome, @TempData["UserName"]</span>
@@ -118,9 +117,6 @@
         </main>
     </div>
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - ShoppingMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -132,6 +128,35 @@
 <script>
     console.log("Total Items in Cart: @totalItemsInCart");
 </script>
+
+@* <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var searchInput = document.getElementById("searchInput");
+        var searchResults = document.getElementById("searchResults");
+
+        searchInput.addEventListener("input", function () {
+            var query = searchInput.value.trim();
+            if (query !== '') {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "search.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            searchResults.innerHTML = xhr.responseText;
+                        } else {
+                            console.error("Error: " + xhr.status);
+                        }
+                    }
+                };
+                xhr.send("itemName=" + encodeURIComponent(query)); // Send query parameter as itemName
+            } else {
+                searchResults.innerHTML = ''; // Clear search results if query is empty
+            }
+        });
+    });
+</script> *@
+
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
